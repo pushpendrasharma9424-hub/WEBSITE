@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prem Sharma</title>
+<style>
+:root {
+  --main-color: #4a90e2;
+}
+body {
+  margin:0; padding:0;
+  font-family: 'Arial', sans-serif;
+  background: #fff;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.5s, color 0.5s;
+}
+
+.profile {
+  text-align: center;
+  animation: fadeIn 2s ease-in-out;
+}
+
+.profile img {
+  width:140px; height:140px;
+  border-radius:50%;
+  margin-bottom:15px;
+  transition: transform 0.3s, border 0.3s;
+  border:3px solid var(--main-color);
+}
+
+.profile img:hover {
+  transform: scale(1.1) rotate(5deg);
+  border-color: #357ABD;
+}
+
+.profile h1 {
+  margin:0 0 20px 0;
+  font-size:2.2em;
+  color: var(--main-color);
+  animation: slideDown 1.5s ease;
+}
+
+.search-bar {
+  display:flex;
+  margin-bottom: 20px;
+  animation: fadeIn 2s 0.5s forwards;
+  opacity:0;
+}
+
+.search-bar input {
+  padding:10px;
+  width:250px;
+  border-radius:5px;
+  border:1px solid #ccc;
+  outline:none;
+  transition: box-shadow 0.3s;
+}
+
+.search-bar input:focus {
+  box-shadow: 0 0 10px var(--main-color);
+}
+
+.search-bar button {
+  padding:10px 15px;
+  margin-left:5px;
+  border:none;
+  background: var(--main-color);
+  color:#fff;
+  cursor:pointer;
+  border-radius:5px;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.search-bar button:hover {
+  background:#357ABD;
+  transform: scale(1.1);
+}
+
+#loginBtn {
+  padding:8px 15px;
+  background:#e94e77;
+  color:#fff;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+  margin-bottom:15px;
+  transition: background 0.3s, transform 0.3s;
+}
+
+#loginBtn:hover {
+  background:#d63c65;
+  transform: scale(1.05);
+}
+
+#adminPanel {
+  position: fixed; top:50%; left:50%;
+  transform: translate(-50%,-50%);
+  background: #f5f5f5; padding:20px;
+  border:1px solid #ccc; border-radius:8px;
+  display:none;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  z-index:1000;
+}
+
+#adminPanel input {
+  width:100%; padding:8px; margin:5px 0;
+  border-radius:5px; border:1px solid #ccc;
+}
+
+#adminPanel button {
+  padding:8px 12px;
+  background:#4caf50; color:#fff;
+  border:none; cursor:pointer;
+  border-radius:5px;
+  margin-top:5px;
+}
+
+footer {
+  position:fixed; bottom:10px;
+  font-size:14px;
+  color:#777;
+  animation: fadeIn 2s 1s forwards;
+  opacity:0;
+}
+
+@keyframes fadeIn {
+  from {opacity:0;}
+  to {opacity:1;}
+}
+
+@keyframes slideDown {
+  from {opacity:0; transform: translateY(-50px);}
+  to {opacity:1; transform: translateY(0);}
+}
+</style>
+</head>
+<body>
+
+<div class="profile">
+  <img id="profilePhoto" src="" alt="Profile Photo">
+  <h1 id="profileName"></h1>
+</div>
+
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="Search YouTube...">
+  <button id="searchBtn">Search</button>
+  <button id="voiceBtn">🎤</button>
+</div>
+
+<button id="loginBtn">Admin Login</button>
+
+<div id="adminPanel">
+  <h3>Admin Panel</h3>
+  <label>Name: <input type="text" id="editName"></label>
+  <label>Photo URL: <input type="text" id="editPhoto"></label>
+  <label>Theme Color: <input type="color" id="editColor"></label>
+  <label>Footer Text: <input type="text" id="editFooter"></label>
+  <button id="saveChanges">Save</button>
+</div>
+
+<footer id="footerText">Made by PREM</footer>
+
+<script>
+// Default data
+const defaultData = {
+  name: "PREM SHARMA",
+  photo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTO6g7hUPkq7G92HHvm7xdV0jtR0txgnCiuEw&s",
+  color: "#4a90e2",
+  footer: "Made by PREM"
+};
+
+let data = JSON.parse(localStorage.getItem("premData")) || defaultData;
+
+// Apply data
+function applyData(){
+  document.getElementById("profileName").innerText = data.name;
+  document.getElementById("profilePhoto").src = data.photo;
+  document.documentElement.style.setProperty('--main-color', data.color);
+  document.getElementById("footerText").innerText = data.footer;
+}
+applyData();
+
+// YouTube search
+document.getElementById("searchBtn").addEventListener("click",()=>{
+  const q = encodeURIComponent(document.getElementById("searchInput").value);
+  if(q) window.open(`https://www.youtube.com/results?search_query=${q}`, "_blank");
+});
+
+// Voice search
+document.getElementById("voiceBtn").addEventListener("click",()=>{
+  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.onresult = function(event){
+    document.getElementById("searchInput").value = event.results[0][0].transcript;
+    window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(event.results[0][0].transcript)}`, "_blank");
+  }
+  recognition.start();
+});
+
+// Admin login
+document.getElementById("loginBtn").addEventListener("click",()=>{
+  const user = prompt("Username:");
+  const pass = prompt("Password:");
+  if(user==="PREM" && pass==="123456"){
+    const panel = document.getElementById("adminPanel");
+    panel.style.display="block";
+    document.getElementById("editName").value = data.name;
+    document.getElementById("editPhoto").value = data.photo;
+    document.getElementById("editColor").value = data.color;
+    document.getElementById("editFooter").value = data.footer;
+  } else alert("Wrong credentials");
+});
+
+// Save changes
+document.getElementById("saveChanges").addEventListener("click", ()=>{
+  data.name = document.getElementById("editName").value;
+  data.photo = document.getElementById("editPhoto").value;
+  data.color = document.getElementById("editColor").value;
+  data.footer = document.getElementById("editFooter").value;
+  localStorage.setItem("premData", JSON.stringify(data));
+  applyData();
+  alert("Changes saved!");
+});
+</script>
+
+</body>
+</html>
